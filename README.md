@@ -6,7 +6,7 @@
 
 ### Set up the sample basic middleware server - Host server public hostname and port
 
-First set up the basic middleware server from https://github.com/nexmo-se/websocket-server-variant-3.
+First set up the basic middleware server from either https://github.com/nexmo-se/websocket-server-variant-3 or https://github.com/nexmo-se/openai-realtime-connector.
 
 Default local (not public!) of that middleware server `port` is: 6000.
 
