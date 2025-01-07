@@ -12,7 +12,8 @@
     "@vonage/server-sdk": "^3.19.2",
     "body-parser": "^1.20.3",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "request": "^2.88.2"
   },
   "engines": {
     "node": "18.19"

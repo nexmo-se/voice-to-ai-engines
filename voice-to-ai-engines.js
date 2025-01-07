@@ -46,20 +46,27 @@ const credentials = new Auth({
   privateKey: './.private.key'    // private key file name with a leading dot 
 });
 
-const apiBaseUrl = "https://" + process.env.API_REGION;
+const apiRegion = "https://" + process.env.API_REGION;
 
 const options = {
-  apiHost: apiBaseUrl
+  apiHost: apiRegion
 };
 
 const { Vonage } = require('@vonage/server-sdk');
 
 const vonage = new Vonage(credentials, options);
 
-// Use for direct REST API calls - Sample code
-// const appId = process.env.APP_ID; // used by tokenGenerate
-// const privateKey = fs.readFileSync('./.private.key'); // used by tokenGenerate
-// const { tokenGenerate } = require('@vonage/jwt');
+//-- For call leg recording --
+
+const fs = require('fs');
+const request = require('request');
+
+const appId = process.env.APP_ID; // used by tokenGenerate
+const privateKey = fs.readFileSync('./.private.key'); // used by tokenGenerate
+const { tokenGenerate } = require('@vonage/jwt');
+
+const vonageNr = new Vonage(credentials, {} );  
+const apiBaseUrl = "https://api-us.vonage.com";
 
 //-------------------
 
@@ -97,17 +104,12 @@ app.post('/event', async(req, res) => {
 
   res.status(200).send('Ok');
 
-  let hostName;
-
-  if (neruHost) {
-    hostName = neruHost;
-  } else {
-    hostName = req.hostname;
-  }
-
   //--
 
+  const hostName = req.hostname;
   const pstn1Uuid = req.body.uuid;
+
+  //--
 
   if (req.body.type == 'transfer') {  // this is when PSTN 1 leg is effectively connected to the named conference
 
@@ -181,6 +183,37 @@ app.post('/event', async(req, res) => {
     //    })
     //   .catch(err => console.error(">>> error get call status of PSTN leg A", pstn1Uuid, err))  
 
+    //-- start "leg" recording --
+    const accessToken = tokenGenerate(process.env.APP_ID, privateKey, {});
+
+    // request.post(apiRegion + '/v1/legs/' + pstn1Uuid + '/recording', {
+    request.post(apiBaseUrl + '/v1/legs/' + pstn1Uuid + '/recording', {
+        headers: {
+            'Authorization': 'Bearer ' + accessToken,
+            "content-type": "application/json",
+        },
+        body: {
+          "split": true,
+          "streamed": true,
+          // "beep": true,
+          "public": true,
+          "validity_time": 30,
+          "format": "mp3",
+          // "transcription": {
+          //   "language":"en-US",
+          //   "sentiment_analysis": true
+          // }
+        },
+        json: true,
+      }, function (error, response, body) {
+        if (error) {
+          console.log('Error start recording:', pstn1Uuid, error.body);
+        }
+        else {
+          console.log('Start recording response:', pstn1Uuid, response.body);
+        }
+    });    
+
   };
 
   //--
@@ -202,8 +235,8 @@ app.post('/event', async(req, res) => {
         .catch(err => console.error(">>> error get call status of PSTN leg 1", ws1Uuid, err))    
     };
 
-    // //-- terminate PSTN 2 leg if in progress
-    // const pstn2Uuid = app.get('pstn2_from_pstn1_' + pstn1Uuid);
+    //-- terminate PSTN 2 leg if in progress
+    const pstn2Uuid = app.get('pstn2_from_pstn1_' + pstn1Uuid);
 
     // if (pstn2Uuid) {
     //   vonage.voice.getCall(pstn2Uuid)
@@ -529,6 +562,39 @@ app.post('/ws_event_2', async(req, res) => {
       .catch(err => console.error(">>> Error get status of PSTN leg 2", pstn2Uuid, err))  
   
   };
+
+});
+
+//-- Retrieve call recordings --
+
+app.post('/rtc', async(req, res) => {
+
+  res.status(200).send('Ok');
+
+  switch (req.body.type) {
+
+    case "audio:record:done": // leg recording, get the audio file
+      console.log('\n>>> /rtc audio:record:done');
+      console.log('req.body.body.destination_url', req.body.body.destination_url);
+      console.log('req.body.body.recording_id', req.body.body.recording_id);
+
+      await vonageNr.voice.downloadRecording(req.body.body.destination_url, './post-call-data/' + req.body.body.recording_id + '_' + req.body.body.channel.id + '.mp3');
+ 
+      break;
+
+    case "audio:transcribe:done": // leg recording, get the transcript
+      console.log('\n>>> /rtc audio:transcribe:done');
+      console.log('req.body.body.transcription_url', req.body.body.transcription_url);
+      console.log('req.body.body.recording_id', req.body.body.recording_id);
+
+      await vonageNr.voice.downloadTranscription(req.body.body.transcription_url, './post-call-data/' + req.body.body.recording_id + '.txt');  
+
+      break;      
+    
+    default:  
+      // do nothing
+
+  }
 
 });
  
