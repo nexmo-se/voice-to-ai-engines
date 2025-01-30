@@ -8,7 +8,7 @@
 
 First set up the basic middleware server from one of the following repositories</br>
 https://github.com/nexmo-se/openai-realtime-connector,</br>
-https://github.com/nexmo-se/dg-oai-l11-connector,</br>
+https://github.com/nexmo-se/dg-oai-11l-connector,</br>
 https://github.com/nexmo-se/websocket-server-variant-3.</br>
 
 Default local (not public!) of that middleware server `port` is: 6000.
