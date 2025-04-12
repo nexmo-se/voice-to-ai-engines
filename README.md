@@ -1,6 +1,6 @@
 # Sample application using Vonage Voice API to connect Voice Calls to AI Engines
 
-You may use this Voice API application to connect voice calls to AI Engines using one of the Connectors listed in the Set up section .
+You may use this Voice API application to connect voice calls to AI Engines using one of the Connectors listed in the Set up section.
 
 Voice calls may be:</br>
 inbound/outbound,</br>
