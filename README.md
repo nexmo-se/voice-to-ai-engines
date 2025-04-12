@@ -2,9 +2,9 @@
 
 ## Set up
 
-### Set up the sample basic middleware server - Host server public hostname and port
+### Set up the sample connector server - Host server public hostname and port
 
-First set up the basic middleware server from one of the following repositories</br>
+First set up the connector server (aka middleware server) from one of the following repositories</br>
 https://github.com/nexmo-se/dg-oai-11l-connector,</br>
 https://github.com/nexmo-se/elevenlabs-agent-ws-connector,</br>
 https://github.com/nexmo-se/openai-realtime-connector,</br>
