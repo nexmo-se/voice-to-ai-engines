@@ -49,7 +49,7 @@ For the next steps, you will need:</br>
 
 Copy or rename .env-example to .env<br>
 Update parameters in .env file<br>
-Have Node.js installed on your system, this application has been tested with Node.js version 18.19.1<br>
+Have Node.js installed on your system, this application has been tested with Node.js version 18.19<br>
 
 Install node modules with the command:<br>
  ```bash
@@ -72,9 +72,9 @@ Call the **`phone number linked`** to your application to get connected to the C
 
 To manually trigger an outbound PSTN call to a number, open a web browser, enter the address:<br>
 
-_https://<server-address>/call?callee=<number>_<br>
+_https://<server-address>/call?callee=\<number\>_<br>
 
-the \<number\> must in E.164 format without '+' sign, or '-', '.' characters")
+the \<number\> must in E.164 format without '+' sign, or '-', '.' characters
 
 for example, it looks like
 
