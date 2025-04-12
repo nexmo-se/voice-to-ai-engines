@@ -131,8 +131,8 @@ app.get('/answer', async(req, res) => {
   //--
 
   const nccoResponse = [
-    {
-      "action": "talk",   //-- this talk action section is optional
+    {                     //-- this talk action section is optional
+      "action": "talk",   
       "text": "Connecting your call, please wait.",
       "language": "en-US",
       "style": 11
@@ -189,42 +189,7 @@ app.post('/event', async(req, res) => {
       .then(res => {
         console.log(">>> WebSocket create status:", res);
       })
-      .catch(err => console.error(">>> WebSocket create error:", err))
-
-  
-    // if (recordCalls) {
-    //   //-- RTC webhooks need to be enabled for this application in the dashboard --
-    //   //-- start "leg" recording --
-    //   const accessToken = tokenGenerate(process.env.APP_ID, privateKey, {});
-
-    //   // request.post(apiRegion + '/v1/legs/' + uuid + '/recording', {
-    //   request.post(apiBaseUrl + '/v1/legs/' + uuid + '/recording', {
-    //       headers: {
-    //           'Authorization': 'Bearer ' + accessToken,
-    //           "content-type": "application/json",
-    //       },
-    //       body: {
-    //         "split": true,
-    //         "streamed": true,
-    //         // "beep": true,
-    //         "public": true,
-    //         "validity_time": 30,
-    //         "format": "mp3",
-    //         // "transcription": {
-    //         //   "language":"en-US",
-    //         //   "sentiment_analysis": true
-    //         // }
-    //       },
-    //       json: true,
-    //     }, function (error, response, body) {
-    //       if (error) {
-    //         console.log('Error start recording on leg:', uuid, error.body);
-    //       }
-    //       else {
-    //         console.log('Start recording on leg:', uuid, response.body);
-    //       }
-    //   });
-    // }    
+      .catch(err => console.error(">>> WebSocket create error:", err))  
 
   };
 
@@ -343,7 +308,7 @@ app.get('/answer_2', async(req, res) => {
 
   // WebSocket connection URI
   // Custom data: participant identified as 'user1' in this example, could be 'agent', 'customer', 'patient', 'doctor', '6tf623f9ffk4dcj91' ...
-  // PSTN 1 call direction is 'outbound'
+  // PSTN call direction is 'outbound'
   const wsUri = 'wss://' + processorServer + '/socket?participant=' + 'user1' +'&call_direction=outbound&peer_uuid=' + uuid + '&caller_number=' + req.query.from + '&callee_number=' + req.query.to + '&webhook_url=https://' + hostName + '/results';
 
   const nccoResponse = [
@@ -405,42 +370,7 @@ app.post('/event_2', async(req, res) => {
       .then(res => {
         console.log(">>> WebSocket create status:", res);
       })
-      .catch(err => console.error(">>> WebSocket create error:", err))
-
-  
-    // if (recordCalls) {
-    //   //-- RTC webhooks need to be enabled for this application in the dashboard --
-    //   //-- start "leg" recording --
-    //   const accessToken = tokenGenerate(process.env.APP_ID, privateKey, {});
-
-    //   // request.post(apiRegion + '/v1/legs/' + uuid + '/recording', {
-    //   request.post(apiBaseUrl + '/v1/legs/' + uuid + '/recording', {
-    //       headers: {
-    //           'Authorization': 'Bearer ' + accessToken,
-    //           "content-type": "application/json",
-    //       },
-    //       body: {
-    //         "split": true,
-    //         "streamed": true,
-    //         // "beep": true,
-    //         "public": true,
-    //         "validity_time": 30,
-    //         "format": "mp3",
-    //         // "transcription": {
-    //         //   "language":"en-US",
-    //         //   "sentiment_analysis": true
-    //         // }
-    //       },
-    //       json: true,
-    //     }, function (error, response, body) {
-    //       if (error) {
-    //         console.log('Error start recording on leg:', uuid, error.body);
-    //       }
-    //       else {
-    //         console.log('Start recording on leg:', uuid, response.body);
-    //       }
-    //   });
-    // }    
+      .catch(err => console.error(">>> WebSocket create error:", err))   
 
   };
 
