@@ -26,7 +26,11 @@ https://github.com/nexmo-se/elevenlabs-agent-ws-connector,</br>
 https://github.com/nexmo-se/openai-realtime-connector,</br>
 https://github.com/nexmo-se/websocket-server-variant-3.</br>
 
-Default local (not public!) of that middleware server `port` is: 6000.
+_Note:
+The current repository https://github.com/nexmo-se/vonage-deepgram-voice-agent combines both the sample Voice API application and the Connector application in one server program.<br>
+Soon, the standalone Connector application for Deepgram Voice Agent will be created like the other Connector repositories listed above._
+
+Default local (not public!) of that Connector server `port` is: 6000.
 
 If you plan to test using `Local deployment` with ngrok (Internet tunneling service) for both the sample middleware server application and this sample Voice API application, you may set up [multiple ngrok tunnels](https://ngrok.com/docs/agent/config/#tunnel-configurations).
 
