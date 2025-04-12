@@ -18,7 +18,7 @@ Instead of using this sample Voice API application, you may use your own existin
 
 Your new or existing Voice API application may be written with any programming language using [server SDKs](https://developer.vonage.com/en/tools) or with direct [REST API] (https://developer.vonage.com/en/api/voice) calls.
 
-You may also have your Vonage Video API WebRTC Clients establish sessions with AI engines through the [Audio Connector](https://tokbox.com/developer/guides/audio-connector) and the peer Connector server as listed in the next section.
+You may also have your Vonage [Video API WebRTC Clients](https://tokbox.com/developer/sdks/js/) establish sessions with AI engines through the [Audio Connector](https://tokbox.com/developer/guides/audio-connector) and the peer Connector server as listed in the next section.
 
 
 ## Set up
