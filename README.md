@@ -1,14 +1,13 @@
 # Reference application using Vonage Voice API to connect Voice Calls to AI Engines
 
-// Following to be updated
-
 ## Set up
 
 ### Set up the sample basic middleware server - Host server public hostname and port
 
 First set up the basic middleware server from one of the following repositories</br>
-https://github.com/nexmo-se/openai-realtime-connector,</br>
 https://github.com/nexmo-se/dg-oai-11l-connector,</br>
+https://github.com/nexmo-se/elevenlabs-agent-ws-connector,</br>
+https://github.com/nexmo-se/openai-realtime-connector,</br>
 https://github.com/nexmo-se/websocket-server-variant-3.</br>
 
 Default local (not public!) of that middleware server `port` is: 6000.
@@ -59,86 +58,30 @@ npm install
 
 Launch the application:<br>
 ```bash
-node pstn-websocket-app
+node voice-to-ai-engines
 ```
-
 Default local (not public!) of this application server `port` is: 8000.
 
-## Overview of how this application establishes PSTN and WebSocket calls
+### How to make PSTN calls
 
-See corresponding diagram *call-flow.png*
+#### Inbound calling
 
-Step 1 - Establish WebSocket 1 call, once answered drop that leg into a unique named conference (NCCO with action conversation).
+Call the **`phone number linked`** to your application to get connected to the Conversational AI Agent.
 
-Step 2 - Place outbound PSTN 1 call, once answered drop that leg into same named conference (NCCO with action conversation).
+#### Outbound calling
 
-Step 4 - Establish WebSocket 2 call, once answered drop that leg into same named conference (NCCO with action conversation).
+To manually trigger an outbound PSTN call to a number, open a web browser, enter the address:<br>
 
-Step 6 - Place outbound PSTN 2 call, once answered drop that leg into same named conference (NCCO with action conversation).
+_https://<server-address>/call?callee=<number>_<br>
 
-### Additional info
+the \<number\> must in E.164 format without '+' sign, or '-', '.' characters")
 
-In step 1, regarding WebSocket 1 leg, there are no specific audio controls yet.</br>
+for example, it looks like
 
-In step 2, regarding PSTN 1 leg,</br>
-the NCCO with action conversation includes the array parameter *canSpeak* that lists WebSocket 1 leg uuid,</br>
-meaning PSTN 1 sends audio to WebSocket 1 leg,</br>
-the array parameter *canHear* stays empty for now.</br>
+https://xxxx.ngrok.app/call?callee=12995551212
 
-In step 3, regarding WebSocket 1 leg,</br>
-the NCCO with action conversation includes the array parameter *canHear* that lists PSTN 1 leg uuid,</br>
-meaning WebSocket 1 receives only the audio from PSTN 1 leg,</br>
-the array parameter *canSpeak* stays empty for now.</br>
+Upon answering the call, the callee will get connected to the Conversational AI Agent.
 
-In step 4, regarding WebSocket 2 leg,</br>
-the NCCO with action conversation includes the array parameter *canSpeak* that lists PSTN 1 leg uuid,</br>
-meaning WebSocket 2 sends audio only to PSTN 1 leg,</br>
-the array parameter *canHear* stays empty for now.</br>
-
-In step 5, regarding PSTN 1 leg,</br>
-the NCCO with action conversation includes the array parameter *canSpeak* that lists WebSocket 1 leg uuid,</br>
-meaning PSTN 1 sends audio only to WebSocket 1 leg,</br>
-the array parameter *canHear* that lists WebSocket 2 leg uuid,</br>
-meaning PSTN 1 receives audio only from WebSocket 2 leg.</br>
-
-In step 6, regarding PSTN 2 leg,</br>
-the NCCO with action conversation includes the array parameter *canSpeak* that lists WebSocket 2 leg uuid,</br>
-meaning PSTN 2 sends audio only to WebSocket 2 leg,</br>
-the array parameter *canHear* that lists WebSocket 1 leg uuid,</br>
-meaning PSTN 2 receives audio only from WebSocket 1 leg.</br>
-
-In step 7, regarding WebSocket 1 leg,</br>
-the NCCO with action conversation includes the array parameter *canSpeak* that lists PSTN 2 leg uuid,</br>
-meaning WebSocket 1 sends audio only to PSTN 2 leg,</br>
-the array parameter *canHear* that lists PSTN 1 leg uuid,</br>
-meaning WebSocket 1 receives audio only from PSTN 1  leg.</br>
-
-In step 8, regarding WebSocket 2 leg,</br>
-the NCCO with action conversation includes the array parameter *canSpeak* that lists PSTN 1 leg uuid,</br>
-meaning WebSocket 2 sends audio only to PSTN 1 leg,</br>
-the array parameter *canHear* that lists PSTN 2 leg uuid,</br>
-meaning WebSocket 2 receives audio only from PSTN 2  leg.</br>
-
-
-
-In steps 5 and 6, both NCCOs with action conversation include endOnExit true flag because if either PSTN 1 or PSTN 2 remote party ends the call, then all legs attached to the same conference should be terminated.</br>
-
-In step 2, the NCCO with action conversation does not include endOnExit true flag because it may automatically terminate all legs which is an undesired behavior.</br>
-
-Application automatically terminates PSTN 2 leg call setup in progress (e.g. in ringing state, ...) if PSTN 1 leg remote party hung up while PSTN 2 party is being called or just answered.</br>
-
-When establishing WebSockets, desired custom meta data that should be transmitted to the middleware server are passed as query parameters in the WebSocket URI itself.</br>
-In this sample code, sample meta data parameters are passed, you may define what are needed for your application logic.</br>
-
-### Try the application
-
-From a web browser trigger test calls with the web address:</br>
-
-`https://<server-address/startcall`
-
-or
-
-`https://<server-address/startcall?pstn1=12995551212&pstn2=12995551313&param1=en-US&param2=es-MX`
 
 
 

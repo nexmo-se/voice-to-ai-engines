@@ -4,10 +4,6 @@
 
 require('dotenv').config();
 
-//--- for Neru installation ----
-const neruHost = process.env.NERU_HOST;
-console.log('neruHost:', neruHost);
-
 //--
 const express = require('express');
 const bodyParser = require('body-parser')
@@ -29,11 +25,6 @@ app.use(function (req, res, next) {
 
 const servicePhoneNumber = process.env.SERVICE_PHONE_NUMBER;
 console.log("Service phone number:", servicePhoneNumber);
-
-const pstnCalleeNumber = process.env.PSTN_CALLEE_NUMBER;
-console.log("Second PSTN phone number:", pstnCalleeNumber);
-
-// const simulatedDelay = process.env.SIMULATED_DELAY; // delay before establishing outbound calling to other PSTN party
 
 //--- Vonage API ---
 
@@ -70,124 +61,46 @@ const apiBaseUrl = "https://api-us.vonage.com";
 
 //-------------------
 
-// WebSocket server (middleware)
+// Connector server (middleware)
 const processorServer = process.env.PROCESSOR_SERVER;
+
+//-------------------
+
+let recordCalls = false;
+if (process.env.RECORD_CALLS == 'true') {
+  recordCalls = true
+}
+
+//---- Custom settings ---
+const maxCallDuration = process.env.MAX_CALL_DURATION; // in seconds
+
+console.log('------------------------------------------------------------');
+console.log('To manually trigger an outbound PSTN call to "callee" number');
+console.log('in a web browser, enter the address:');
+console.log('https://<server-address>/call?callee=<number>');
+console.log("<number> must in E>164 format without '+' sign, or '-', '.' characters");
+console.log('for example'),
+console.log('https://xxxx.ngrok.app/call?callee=12995551212');
+console.log('------------------------------------------------------------');
+
 
 //============= Processing inbound PSTN calls ===============
 
-//-- Incoming PSTN 1 call --
-//-- Step a below <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//-- Incoming PSTN call --
 
 app.get('/answer', async(req, res) => {
 
-  const pstn1Uuid = req.query.uuid;
-
-  const nccoResponse = [
-    {
-      "action": "conversation",
-      "name": "conf_" + pstn1Uuid, // PSTN 1
-      "startOnEnter": true,
-      "endOnExit": true
-    }
-  ];
-
-  res.status(200).json(nccoResponse);
-
-  // temporarily store the caller number associated to the call uuid of PSTN 1 leg
-  app.set('caller_number_from_uuid_' + pstn1Uuid, req.query.from);
-
-});
-
-//------------
-
-app.post('/event', async(req, res) => {
-
-  res.status(200).send('Ok');
+  const uuid = req.query.uuid;
 
   //--
 
-  const hostName = req.hostname;
-  const pstn1Uuid = req.body.uuid;
-
-  //--
-
-  if (req.body.type == 'transfer') {  // this is when PSTN 1 leg is effectively connected to the named conference
-
-    const callerNumber = app.get('caller_number_from_uuid_' + pstn1Uuid);
-
-    //-- Create WebSocket 1 leg --
-    //-- step b1 below <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 
-
-    // WebSocket connection URI
-    // Custom data: participant identified as 'user1' in this example, could be 'agent', 'customer', 'patient', 'doctor', ...
-    // PSTN 1 call direction is 'inbound'
-    const wsUri = 'wss://' + processorServer + '/socket?participant=' + 'user1' +'&call_direction=inbound&peer_uuid=' + pstn1Uuid + '&caller_number=' + callerNumber;
-
-    vonage.voice.createOutboundCall({
-      to: [{
-        type: 'websocket',
-        uri: wsUri,
-        'content-type': 'audio/l16;rate=16000'  // NEVER change the content-type parameter argument
-      }],
-      from: {
-        type: 'phone',
-        number: callerNumber
-      },
-      answer_url: ['https://' + hostName + '/ws_answer_1?original_uuid=' + pstn1Uuid],
-      answer_method: 'GET',
-      event_url: ['https://' + hostName + '/ws_event_1?original_uuid=' + pstn1Uuid],
-      event_method: 'POST'
-      })
-      .then(res => {
-        app.set('wsa1_from_pstn1_' + pstn1Uuid, res.uuid); // associate to PSTN leg A uuid the WebSocket leg A uuid
-        console.log(">>> WebSocket 1 create status:", res);
-      })
-      .catch(err => console.error(">>> WebSocket 1 create error:", err))
-
-    // //-- Create PSTN 2 leg --
-    // //-- Step b2 below <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-    // vonage.voice.createOutboundCall({
-    //   to: [{
-    //     type: 'phone',
-    //     number: pstnCalleeNumber
-    //   }],
-    //   from: {
-    //    type: 'phone',
-    //    number: servicePhoneNumber
-    //   },
-    //   answer_url: ['https://' + hostName + '/answer_2?original_uuid=' + pstn1Uuid],
-    //   answer_method: 'GET',
-    //   event_url: ['https://' + hostName + '/event_2?original_uuid=' + pstn1Uuid],
-    //   event_method: 'POST'
-    //   })
-    //   .then(res => {
-    //     console.log(">>> outgoing PSTN 2 call status:", res);
-    //     app.set('pstn2_from_pstn1_' + pstn1Uuid, res.uuid);
-    //     })
-    //   .catch(err => console.error(">>> outgoing PSTN 1 call error:", err))
-      
-    // //-- Play audio file with ring back tone sound to PSTN leg 1 --
-
-    // vonage.voice.getCall(pstn1Uuid)
-    //   .then(res => {
-    //     if (res.status == 'answered') { // is PSTN leg 1 still up?
-
-    //       vonage.voice.streamAudio(pstn1Uuid, 'http://client-sdk-cdn-files.s3.us-east-2.amazonaws.com/us.mp3', 0, -0.6)
-    //         .then(res => console.log(`>>> streaming ring back tone to call ${pstn1Uuid} status:`, res))
-    //         .catch(err => {
-    //           console.error(`>>> streaming ring back tone to call ${pstn1Uuid} error:`, err)
-    //         });
-
-    //     }
-    //    })
-    //   .catch(err => console.error(">>> error get call status of PSTN leg A", pstn1Uuid, err))  
-
+  if (recordCalls) {
+    //-- RTC webhooks need to be enabled for this application in the dashboard --
     //-- start "leg" recording --
     const accessToken = tokenGenerate(process.env.APP_ID, privateKey, {});
 
-    // request.post(apiRegion + '/v1/legs/' + pstn1Uuid + '/recording', {
-    request.post(apiBaseUrl + '/v1/legs/' + pstn1Uuid + '/recording', {
+    // request.post(apiRegion + '/v1/legs/' + uuid + '/recording', {
+    request.post(apiBaseUrl + '/v1/legs/' + uuid + '/recording', {
         headers: {
             'Authorization': 'Bearer ' + accessToken,
             "content-type": "application/json",
@@ -207,57 +120,111 @@ app.post('/event', async(req, res) => {
         json: true,
       }, function (error, response, body) {
         if (error) {
-          console.log('Error start recording:', pstn1Uuid, error.body);
+          console.log('Error start recording on leg:', uuid, error.body);
         }
         else {
-          console.log('Start recording response:', pstn1Uuid, response.body);
+          console.log('Start recording on leg:', uuid, response.body);
         }
-    });    
-
-  };
+    });
+  } 
 
   //--
 
-  if (req.body.status == 'completed') {
+  const nccoResponse = [
+    {
+      "action": "talk",   //-- this talk action section is optional
+      "text": "Connecting your call, please wait.",
+      "language": "en-US",
+      "style": 11
+    },
+    {
+      "action": "conversation",
+      "name": "conf_" + uuid,
+      "startOnEnter": true,
+      "endOnExit": true
+    }
+  ];
 
-    //-- terminate WebSocket 1 leg if in progress
-    const ws1Uuid = app.get('ws1_from_pstn1_' + pstn1Uuid);
+  res.status(200).json(nccoResponse);
 
-    if (ws1Uuid) {
-      vonage.voice.getCall(ws1Uuid)
-        .then(res => {
-          if (res.status == 'ringing' || res.status == 'answered') {
-            vonage.voice.hangupCall(ws1Uuid)
-              .then(res => console.log(">>> WebSocket 1 leg terminated", ws1Uuid))
-              .catch(err => null) // WebSocket 1 leg has already been terminated
-          }
-         })
-        .catch(err => console.error(">>> error get call status of PSTN leg 1", ws1Uuid, err))    
-    };
+});
 
-    //-- terminate PSTN 2 leg if in progress
-    const pstn2Uuid = app.get('pstn2_from_pstn1_' + pstn1Uuid);
+//------------
 
-    // if (pstn2Uuid) {
-    //   vonage.voice.getCall(pstn2Uuid)
-    //     .then(res => {
-    //       if (res.status == 'ringing' || res.status == 'answered') {
-    //         vonage.voice.hangupCall(pstn2Uuid)
-    //           .then(res => console.log(">>> PSTN 2 leg terminated", pstn2Uuid))
-    //           .catch(err => null) // PSTN 2 leg has already been terminated
+app.post('/event', async(req, res) => {
+
+  res.status(200).send('Ok');
+
+  //--
+
+  const hostName = req.hostname;
+  const uuid = req.body.uuid;
+
+  //--
+
+  if (req.body.type == 'transfer') {  // this is when the PSTN leg is effectively connected to the named conference
+
+    //-- Create WebSocket leg --
+
+    // WebSocket connection URI
+    // Custom data: participant identified as 'user1' in this example, could be 'agent', 'customer', 'patient', 'doctor', ...
+    // PSTN call direction is 'inbound'
+    const wsUri = 'wss://' + processorServer + '/socket?participant=' + 'user1' +'&call_direction=inbound&peer_uuid=' + uuid + '&webhook_url=https://' + hostName + '/results';
+
+    vonage.voice.createOutboundCall({
+      to: [{
+        type: 'websocket',
+        uri: wsUri,
+        'content-type': 'audio/l16;rate=16000'  // NEVER change the content-type parameter argument
+      }],
+      from: {
+        type: 'phone',
+        number: '12995550101' // value does not matter
+      },
+      answer_url: ['https://' + hostName + '/ws_answer_1?original_uuid=' + uuid],
+      answer_method: 'GET',
+      event_url: ['https://' + hostName + '/ws_event_1?original_uuid=' + uuid],
+      event_method: 'POST'
+      })
+      .then(res => {
+        console.log(">>> WebSocket create status:", res);
+      })
+      .catch(err => console.error(">>> WebSocket create error:", err))
+
+  
+    // if (recordCalls) {
+    //   //-- RTC webhooks need to be enabled for this application in the dashboard --
+    //   //-- start "leg" recording --
+    //   const accessToken = tokenGenerate(process.env.APP_ID, privateKey, {});
+
+    //   // request.post(apiRegion + '/v1/legs/' + uuid + '/recording', {
+    //   request.post(apiBaseUrl + '/v1/legs/' + uuid + '/recording', {
+    //       headers: {
+    //           'Authorization': 'Bearer ' + accessToken,
+    //           "content-type": "application/json",
+    //       },
+    //       body: {
+    //         "split": true,
+    //         "streamed": true,
+    //         // "beep": true,
+    //         "public": true,
+    //         "validity_time": 30,
+    //         "format": "mp3",
+    //         // "transcription": {
+    //         //   "language":"en-US",
+    //         //   "sentiment_analysis": true
+    //         // }
+    //       },
+    //       json: true,
+    //     }, function (error, response, body) {
+    //       if (error) {
+    //         console.log('Error start recording on leg:', uuid, error.body);
     //       }
-    //      })
-    //     .catch(err => console.error(">>> error get call status of PSTN leg 2", pstn2Uuid, err))    
-    // };
-
-    //--
-
-    console.log(">>> PSTN 1 leg", pstn1Uuid, "terminated");
-
-    //--
-
-    app.set('caller_number_from_uuid_' + pstn1Uuid, null);  // temporarily stored info no longer needed
-    app.set('pstn2_from_pstn1_' + pstn1Uuid, null);         // temporarily stored info no longer needed
+    //       else {
+    //         console.log('Start recording on leg:', uuid, response.body);
+    //       }
+    //   });
+    // }    
 
   };
 
@@ -267,13 +234,12 @@ app.post('/event', async(req, res) => {
 
 app.get('/ws_answer_1', async(req, res) => {
 
-  const pstn1Uuid = req.query.original_uuid;
+  const uuid = req.query.original_uuid;
 
   const nccoResponse = [
     {
       "action": "conversation",
-      "name": "conf_" + pstn1Uuid,
-      "canHear": [pstn1Uuid],
+      "name": "conf_" + uuid,
       "startOnEnter": true
     }
   ];
@@ -288,84 +254,108 @@ app.post('/ws_event_1', async(req, res) => {
 
   res.status(200).send('Ok');
 
-  const ws1Uuid = req.body.uuid;
-  const pstn1Uuid = req.query.original_uuid;
+});
+
+//============= Initiating outbound PSTN calls ===============
+
+//-- Use case where the PSTN call is outbound
+//-- manually trigger outbound PSTN call to "number" - see sample request below
+//-- sample request: https://<server-address>/call?number=12995550101
+
+app.get('/call', async(req, res) => {
+
+  if (req.query.number == null) {
+
+    res.status(200).send('"number" parameter missing as query parameter - please check');
   
-  if (req.body.type == 'transfer') {
+  } else {
 
-    let hostName;
-
-    if (neruHost) {
-      hostName = neruHost;
-    } else {
-      hostName = req.hostname;
-    }   
-
-  };
-
-  //--
-
-  if (req.body.status == 'completed') {
-
-    if (!app.get('pstn2_from_pstn1_' + pstn1Uuid)) { // has (outbound) PSTN leg B not yet been created?
-
-      vonage.voice.getCall(pstn1Uuid)
-        .then(res => {
-          if (res.status != 'completed') {
-            vonage.voice.hangupCall(pstn1Uuid)
-              .then(res => console.log(">>> Terminating PSTN 1 leg", pstn1Uuid))
-              .catch(err => null) // PSTN 1 leg has already been terminated
-          }
-         })
-        .catch(err => console.error(">>> error get call status of PSTN leg 1", pstn1Uuid, err))  
-
-    };
-
-    console.log('>>> WebSocket 1 leg',  ws1Uuid, 'terminated');
-
-    //-- no longer need stored info
-    app.set('ws1_from_pstn1_' + pstn1Uuid, null);
-
-  };
-
-  //--
-
-  if (req.body.status == 'started' || req.body.status == 'ringing') {
-
-    vonage.voice.getCall(pstn1Uuid)
-      
-      .then(res => {
-
-        if (res.status == 'completed') {
-
-          vonage.voice.getCall(ws1Uuid)
-          .then(res => {
-              if (res.status != 'completed') {
-                vonage.voice.hangupCall(ws1Uuid)
-                  .then(res => console.log(">>> WebSocket 1 leg terminated", ws1Uuid))
-                  .catch(err => null) // WebSocket leg 1  has already been terminated 
-              }
-             })
-          .catch(err => console.error(">>> error get call status of WebSocket leg 1", ws1Uuid, err))  
+    // code may be added here to make sure the number is in valid E.164 format (without leading '+' sign)
   
-        }
-       
-       })
-      
-      .catch(err => console.error(">>> error get status of PSTN leg 1", pstn1Uuid, err))  
-  
-  };
+    res.status(200).send('Ok');  
+
+    const hostName = req.hostname;
+
+    //-- Outgoing PSTN call --
+
+    vonage.voice.createOutboundCall({
+      to: [{
+        type: 'phone',
+        number: req.query.number
+      }],
+      from: {
+       type: 'phone',
+       number: servicePhoneNumber
+      },
+      limit: maxCallDuration, // limit outbound call duration for demos purposes
+      answer_url: ['https://' + hostName + '/answer_2'],
+      answer_method: 'GET',
+      event_url: ['https://' + hostName + '/event_2'],
+      event_method: 'POST'
+      })
+      .then(res => console.log(">>> Outgoing PSTN call status:", res))
+      .catch(err => console.error(">>> Outgoing PSTN call error:", err))
+
+    }
 
 });
 
-//--------------
+//-----------------------------
 
 app.get('/answer_2', async(req, res) => {
 
+  const  hostName = req.hostname;
+  const uuid = req.query.uuid;
+
+  if (recordCalls) {
+    //-- RTC webhooks need to be enabled for this application in the dashboard --
+    //-- start "leg" recording --
+    const accessToken = tokenGenerate(process.env.APP_ID, privateKey, {});
+
+    // request.post(apiRegion + '/v1/legs/' + uuid + '/recording', {
+    request.post(apiBaseUrl + '/v1/legs/' + uuid + '/recording', {
+        headers: {
+            'Authorization': 'Bearer ' + accessToken,
+            "content-type": "application/json",
+        },
+        body: {
+          "split": true,
+          "streamed": true,
+          // "beep": true,
+          "public": true,
+          "validity_time": 30,
+          "format": "mp3",
+          // "transcription": {
+          //   "language":"en-US",
+          //   "sentiment_analysis": true
+          // }
+        },
+        json: true,
+      }, function (error, response, body) {
+        if (error) {
+          console.log('Error start recording on leg:', uuid, error.body);
+        }
+        else {
+          console.log('Start recording on leg:', uuid, response.body);
+        }
+    });
+  }   
+
+  // WebSocket connection URI
+  // Custom data: participant identified as 'user1' in this example, could be 'agent', 'customer', 'patient', 'doctor', '6tf623f9ffk4dcj91' ...
+  // PSTN 1 call direction is 'outbound'
+  const wsUri = 'wss://' + processorServer + '/socket?participant=' + 'user1' +'&call_direction=outbound&peer_uuid=' + uuid + '&caller_number=' + req.query.from + '&callee_number=' + req.query.to + '&webhook_url=https://' + hostName + '/results';
+
   const nccoResponse = [
     {
+      "action": "talk",
+      "text": "Hello. This is a call from your preferred voice agent, please wait.",
+      "language": "en-US",
+      "style": 11
+    },
+    {
       "action": "conversation",
-      "name": "conf_" + req.query.original_uuid,
+      "name": "conf_" + uuid,
       "startOnEnter": true,
       "endOnExit": true
     }
@@ -373,12 +363,9 @@ app.get('/answer_2', async(req, res) => {
 
   res.status(200).json(nccoResponse);
 
-  // temporarily store the callee number associated to the call uuid of PSTN 2 leg
-  app.set('callee_number_from_uuid_' + req.query.uuid, req.query.to);
+ });
 
-});
-
-//--------------
+//------------
 
 app.post('/event_2', async(req, res) => {
 
@@ -386,33 +373,19 @@ app.post('/event_2', async(req, res) => {
 
   //--
 
-  let hostName;
-
-  if (neruHost) {
-    hostName = neruHost;
-  } else {
-    hostName = req.hostname;
-  }
+  const hostName = req.hostname;
+  const uuid = req.body.uuid;
 
   //--
 
-  const pstn1Uuid = req.query.original_uuid;
-  const pstn2Uuid = req.body.uuid;
-  const status = req.body.status;
+  if (req.body.type == 'transfer') {  // this is when the PSTN leg is effectively connected to the named conference
 
-  //--
-
-  if (req.body.type == 'transfer') {
-
-    const calleeNumber = app.get('callee_number_from_uuid_' + pstn2Uuid);
-
-    //-- Create WebSocket 2 leg --
-    //-- step c below <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    //-- Create WebSocket leg --
 
     // WebSocket connection URI
-    // Custom data: participant identified as 'user2' in this example, could be 'agent', 'customer', 'patient', 'doctor', ...
-    // PSTN 2 call direction is 'outbound'
-    const wsUri = 'wss://' + processorServer + '/socket?participant=' + 'user2' +'&call_direction=outbound&peer_uuid=' + pstn2Uuid + '&callee_number=' + calleeNumber;
+    // Custom data: participant identified as 'user1' in this example, could be 'agent', 'customer', 'patient', 'doctor', ...
+    // PSTN call direction is 'inbound'
+    const wsUri = 'wss://' + processorServer + '/socket?participant=' + 'user1' +'&call_direction=outbound&peer_uuid=' + uuid + '&webhook_url=https://' + hostName + '/results';
 
     vonage.voice.createOutboundCall({
       to: [{
@@ -422,64 +395,53 @@ app.post('/event_2', async(req, res) => {
       }],
       from: {
         type: 'phone',
-        number: calleeNumber
+        number: '12995550101' // value does not matter
       },
-      answer_url: ['https://' + hostName + '/ws_answer_2?original_uuid=' + pstn1Uuid + '&pstn2_uuid=' + pstn2Uuid],
+      answer_url: ['https://' + hostName + '/ws_answer_2?original_uuid=' + uuid],
       answer_method: 'GET',
-      event_url: ['https://' + hostName + '/ws_event_2?original_uuid=' + pstn1Uuid + '&pstn2_uuid=' + pstn2Uuid],
+      event_url: ['https://' + hostName + '/ws_event_2?original_uuid=' + uuid],
       event_method: 'POST'
       })
       .then(res => {
-        app.set('ws2_from_pstn2_' + pstn2Uuid, res.uuid); // associate to PSTN leg 2 uuid the WebSocket leg 2 uuid
-        console.log(">>> WebSocket 2 create status:", res);
+        console.log(">>> WebSocket create status:", res);
       })
-      .catch(err => console.error(">>> WebSocket 2 create error:", err))
+      .catch(err => console.error(">>> WebSocket create error:", err))
 
-
-    // TBD: Move this section under "transfer" of websocket 2
-    // vonage.voice.getCall(pstn1Uuid)
-    //   .then(res => {
-    //     if (res.status == 'answered') { // is PSTN 1 leg still up?
-
-    //       // stop music-on-hold ring back tone (music-on-hold)      
-    //       vonage.voice.stopStreamAudio(pstn1Uuid)
-    //         .then(res => console.log(`>>> stop streaming ring back tone to call ${pstn1Uuid} status:`, res))
-    //         .catch(err => {
-    //           console.log(`>>> stop streaming ring back tone to call ${pstn1Uuid} error:`, err.body);
-    //         });
-    //     }
-    //    })
-    //   .catch(err => console.error(">>> error get call status of PSTN leg 1", pstn1Uuid, err)) 
   
-  };
+    // if (recordCalls) {
+    //   //-- RTC webhooks need to be enabled for this application in the dashboard --
+    //   //-- start "leg" recording --
+    //   const accessToken = tokenGenerate(process.env.APP_ID, privateKey, {});
 
-  //--
+    //   // request.post(apiRegion + '/v1/legs/' + uuid + '/recording', {
+    //   request.post(apiBaseUrl + '/v1/legs/' + uuid + '/recording', {
+    //       headers: {
+    //           'Authorization': 'Bearer ' + accessToken,
+    //           "content-type": "application/json",
+    //       },
+    //       body: {
+    //         "split": true,
+    //         "streamed": true,
+    //         // "beep": true,
+    //         "public": true,
+    //         "validity_time": 30,
+    //         "format": "mp3",
+    //         // "transcription": {
+    //         //   "language":"en-US",
+    //         //   "sentiment_analysis": true
+    //         // }
+    //       },
+    //       json: true,
+    //     }, function (error, response, body) {
+    //       if (error) {
+    //         console.log('Error start recording on leg:', uuid, error.body);
+    //       }
+    //       else {
+    //         console.log('Start recording on leg:', uuid, response.body);
+    //       }
+    //   });
+    // }    
 
-  if (status == 'ringing' || status == 'answered') {
-    
-    vonage.voice.getCall(pstn1Uuid)
-      .then(res => {
-        if (res.status == 'completed') { // has PSTN 1 leg terminated?
-
-          vonage.voice.hangupCall(pstn2Uuid)
-            .then(res => console.log(">>> PSTN leg 2 terminated", pstn2Uuid))
-            .catch(err => null) // PSTN leg 2 has already been terminated 
-        
-        }
-       })
-      .catch(err => console.error(">>> error get call status of PSTN leg 2", pstn2Uuid, err)) 
-
-  };
-
-  //--
-
-  if (status == 'completed') {
-    
-    console.log('>>> PSTN 2 leg',  pstn2Uuid, 'terminated');
-
-    app.set('pstn2_from_pstn1_' + pstn1Uuid, null);         //-- no longer need stored info
-    app.set('callee_number_from_uuid_' + pstn2Uuid, null);  //-- no longer need stored info
-  
   };
 
 });
@@ -488,11 +450,12 @@ app.post('/event_2', async(req, res) => {
 
 app.get('/ws_answer_2', async(req, res) => {
 
+  const uuid = req.query.original_uuid;
+
   const nccoResponse = [
     {
       "action": "conversation",
-      "name": "conf_" + req.query.original_uuid,
-      "canHear": [req.query.pstn2_uuid],
+      "name": "conf_" + uuid,
       "startOnEnter": true
     }
   ];
@@ -507,65 +470,22 @@ app.post('/ws_event_2', async(req, res) => {
 
   res.status(200).send('Ok');
 
-  const ws2Uuid = req.body.uuid;
-  
-  // if (req.body.type == 'transfer') {
+});
 
-  //   const pstn1Uuid = req.query.original_uuid;
+//------------
 
-  //   // Stop MoH on PSTN 1 leg
+app.post('/results', async(req, res) => {
 
-  //   vonage.voice.getCall(pstn1Uuid)
-  //     .then(res => {
-  //       if (res.status == 'answered') { // is PSTN 1 leg still up?
+  console.log(req.body)
 
-  //         // stop music-on-hold ring back tone (music-on-hold)      
-  //         vonage.voice.stopStreamAudio(pstn1Uuid)
-  //           .then(res => console.log(`>>> stop streaming ring back tone to call ${pstn1Uuid} status:`, res))
-  //           .catch(err => {
-  //             console.log(`>>> stop streaming ring back tone to call ${pstn1Uuid} error:`, err.body);
-  //           });
-  //       }
-  //      })
-  //     .catch(err => console.error(">>> error get call status of PSTN leg 1", pstn1Uuid, err)) 
-
-  // };
-
-  //--
-
-  if (req.body.status == 'completed') {
-
-    console.log('>>> WebSocket 2 leg',  ws2Uuid, 'terminated');
-
-  };
-
-  //--
-
-  if (req.body.status == 'started' || req.body.status == 'ringing') {
-
-    const pstn2Uuid = req.query.pstn2_uuid;
-
-    vonage.voice.getCall(pstn2Uuid)
-      
-      .then(res => {
-
-        if (res.status == 'completed') {
-
-          vonage.voice.hangupCall(ws2Uuid)
-            .then(res => console.log(">>> WebSocket leg 2 terminated", ws2Uuid))
-            .catch(err => null) // WebSocket leg 2 has already been terminated 
-  
-        }
-       
-       })
-      
-      .catch(err => console.error(">>> Error get status of PSTN leg 2", pstn2Uuid, err))  
-  
-  };
+  res.status(200).send('Ok');
 
 });
 
+//-------------
+
 //-- Retrieve call recordings --
+//-- RTC webhook URL set to 'https://<server>/rtc' for this application in the dashboard --
 
 app.post('/rtc', async(req, res) => {
 

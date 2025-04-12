@@ -1,1 +1,1 @@
-web: node ./pstn-websocket-app.js
+web: node ./voice-to-ai-engines.js
