@@ -16,11 +16,16 @@ When a voice call is established, this Voice API application triggers a WebSocke
 
 Instead of using this sample Voice API application, you may use your own existing Voice API application to establish WebSockets with the Connector server to connect your managed voice calls with the AI engines.
 
+Your new or existing Voice API application may be written with any programming language using [server SDKs](https://developer.vonage.com/en/tools) or with direct [REST API] (https://developer.vonage.com/en/api/voice) calls.
+
+You may also have your Vonage Video API WebRTC Clients establish sessions with AI engines through the [Audio Connector](https://tokbox.com/developer/guides/audio-connector) and the peer Connector server as listed in the next section.
+
+
 ## Set up
 
-### Set up the sample connector server - Host server public hostname and port
+### Set up the sample Connector server - Host server public hostname and port
 
-First set up the connector server (aka middleware server) from one of the following repositories</br>
+First set up the Connector server (aka middleware server) from one of the following repositories</br>
 https://github.com/nexmo-se/dg-oai-11l-connector,</br>
 https://github.com/nexmo-se/elevenlabs-agent-ws-connector,</br>
 https://github.com/nexmo-se/openai-realtime-connector,</br>
@@ -102,7 +107,13 @@ https://xxxx.ngrok.app/call?callee=12995551212
 
 Upon answering the call, the callee will get connected to the Conversational AI Agent.
 
+### Cloud deployment
 
+Instructions on how to deploy both this Voice API application as well as the peer Connector application to [Vonage Cloud Runtime](https://developer.vonage.com/en/vonage-cloud-runtime/getting-started/technical-details) serverless infrastructure will be posted here soon.
+
+## Additional resources
+
+If you have questions, join our [Community Slack](https://developer.vonage.com/community/slack) or message us on [X](https://twitter.com/VonageDev?adobe_mc=MCMID%3D61117212728348884173699984659581708157%7CMCORGID%3DA8833BC75245AF9E0A490D4D%2540AdobeOrg%7CTS%3D1740259490).
 
 
 
