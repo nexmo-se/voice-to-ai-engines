@@ -107,6 +107,8 @@ https://xxxx.ngrok.app/call?callee=12995551212
 
 Upon answering the call, the callee will get connected to the Conversational AI Agent.
 
+Of course, you may programmatically initiate outbound calls by using the API call listed in the corresponding webhook section (i.e. `/call`).
+
 ### Cloud deployment
 
 Instructions on how to deploy both this Voice API application as well as the peer Connector application to [Vonage Cloud Runtime](https://developer.vonage.com/en/vonage-cloud-runtime/getting-started/technical-details) serverless infrastructure will be posted here soon.
