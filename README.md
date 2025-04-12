@@ -6,7 +6,7 @@ Voice calls may be:</br>
 inbound/outbound,</br>
 PSTN calls (cell phones, landline phones, fixed phones),</br>
 SIP connections/trunks using [Standard SIP trunks](https://developer.vonage.com/en/sip/overview) or [Programmable SIP Trunks](https://developer.vonage.com/en/voice/voice-api/concepts/programmable-sip),</br>
-[WebRTC](https://developer.vonage.com/en/vonage-client-sdk/overview) clients (iOS/Android/JavaScript),</br>
+[WebRTC](https://developer.vonage.com/en/vonage-client-sdk/overview) clients (iOS/Android/JavaScript).</br>
 
 ## About this sample Voice API application
 
