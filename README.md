@@ -72,7 +72,7 @@ Call the **`phone number linked`** to your application to get connected to the C
 
 To manually trigger an outbound PSTN call to a number, open a web browser, enter the address:<br>
 
-_https://<server-address>/call?callee=\<number\>_<br>
+_https://\<server-address\>/call?callee=\<number\>_<br>
 
 the \<number\> must in E.164 format without '+' sign, or '-', '.' characters
 
