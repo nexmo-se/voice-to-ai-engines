@@ -1,4 +1,20 @@
-# Reference application using Vonage Voice API to connect Voice Calls to AI Engines
+# Sample application using Vonage Voice API to connect Voice Calls to AI Engines
+
+You may use this Voice API application to connect voice calls to AI Engines using one of the Connectors listed in the Set up section .
+
+Voice calls may be:</br>
+inbound/outbound,</br>
+PSTN calls (cell phones, landline phones, fixed phones),</br>
+SIP connections/trunks using [Standard SIP trunks](https://developer.vonage.com/en/sip/overview) or [Programmable SIP Trunks](https://developer.vonage.com/en/voice/voice-api/concepts/programmable-sip),</br>
+[WebRTC](https://developer.vonage.com/en/vonage-client-sdk/overview) clients (iOS/Android/JavaScript),</br>
+
+## About this sample Voice API application
+
+This application connects voice calls to a Connector server by using the [WebSockets feature](https://developer.vonage.com/en/voice/voice-api/concepts/websockets) of Vonage Voice API.</br>
+
+When a voice call is established, this Voice API application triggers a WebSocket connection from Vonage platform to the Connector server which streams audio in one or both directions between the voice call and the AI engines. 
+
+Instead of using this sample Voice API application, you may use your own existing Voice API application to establish WebSockets with the Connector server to connect your managed voice calls with the AI engines.
 
 ## Set up
 
