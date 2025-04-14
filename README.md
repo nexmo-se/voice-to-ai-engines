@@ -16,7 +16,7 @@ When a voice call is established, this Voice API application triggers a WebSocke
 
 Instead of using this sample Voice API application, you may use your own existing Voice API application to establish WebSockets with the Connector server to connect your managed voice calls with the AI engines.
 
-Your new or existing Voice API application may be written with any programming language using [server SDKs](https://developer.vonage.com/en/tools) or with direct [REST API] (https://developer.vonage.com/en/api/voice) calls.
+Your new or existing Voice API application may be written with any programming language using [server SDKs](https://developer.vonage.com/en/tools) or with direct [REST API](https://developer.vonage.com/en/api/voice) calls.
 
 You may also have your Vonage [Video API WebRTC Clients](https://tokbox.com/developer/sdks/js/) establish sessions with AI engines through the [Audio Connector](https://tokbox.com/developer/guides/audio-connector) and the peer Connector server as listed in the next section.
 
