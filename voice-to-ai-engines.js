@@ -78,8 +78,8 @@ console.log('------------------------------------------------------------');
 console.log('To manually trigger an outbound PSTN call to "callee" number');
 console.log('in a web browser, enter the address:');
 console.log('https://<server-address>/call?callee=<number>');
-console.log("<number> must in E>164 format without '+' sign, or '-', '.' characters");
-console.log('for example'),
+console.log("<number> must in E.164 format without '+' sign, or '-', '.' characters");
+console.log('for example');
 console.log('https://xxxx.ngrok.app/call?callee=12995551212');
 console.log('------------------------------------------------------------');
 
