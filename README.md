@@ -53,7 +53,7 @@ one to forward to the local port 6000 (as the Connector application will be list
 the other one to the local port 8000 for this Voice API application.
 
 Start ngrok to start both tunnels that forward to local ports 6000 and 8000, e.g.<br>
-`ngrok start foo bar` (per this [sample yaml configuration file](https://ngrok.com/docs/agent/config/v3/#multiple-endpoints))
+`ngrok start httpbin demo` (per this [sample yaml configuration file](https://ngrok.com/docs/agent/config/v2/#start-the-tunnel-named-httpbin), but needs port 6000 and 8000 as actual values)
 
 please take note of the ngrok Enpoint URL that forwards to local port 6000 as it will be needed when setting the Voice API application, that URL looks like:
 `xxxxxxxx.ngrok.xxx` (for ngrok),<br>
