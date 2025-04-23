@@ -42,7 +42,7 @@ Default local (not public!) of that Connector server `port` is: 6000.
 If you plan to test using a `Local deployment` , you may use ngrok (an Internet tunneling service) for both<br>
 this Voice API application<br>
 and the Connector application<br>
-with [multiple ngrok endpoints](https://ngrok.com/docs/agent/config/v3/#multiple-endpoints).
+with [multiple ngrok endpoints](https://ngrok.com/docs/agent/config/v2/#tunnel-configurations).
 
 To do that, [install ngrok](https://ngrok.com/downloads).<br>
 Log in or sign up with [ngrok](https://ngrok.com/),<br>
@@ -53,7 +53,7 @@ one to forward to the local port 6000 (as the Connector application will be list
 the other one to the local port 8000 for this Voice API application.
 
 Start ngrok to start both tunnels that forward to local ports 6000 and 8000, e.g.<br>
-`ngrok start httpbin demo` (per this [sample yaml configuration file](https://ngrok.com/docs/agent/config/v2/#start-the-tunnel-named-httpbin), but needs port 6000 and 8000 as actual values)
+`ngrok start httpbin demo` (per this [sample yaml configuration file](https://ngrok.com/docs/agent/config/v2/#define-two-tunnels-named-httpbin-and-demo), but needs port 6000 and 8000 as actual values)
 
 please take note of the ngrok Enpoint URL that forwards to local port 6000 as it will be needed when setting the Voice API application, that URL looks like:
 `xxxxxxxx.ngrok.xxx` (for ngrok),<br>
