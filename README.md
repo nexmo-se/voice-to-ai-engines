@@ -55,7 +55,7 @@ the other one to the local port 8000 for this Voice API application.
 Start ngrok to start both tunnels that forward to local ports 6000 and 8000, e.g.<br>
 `ngrok start httpbin demo` (per this [sample yaml configuration file](https://ngrok.com/docs/agent/config/v2/#define-two-tunnels-named-httpbin-and-demo), but needs port 6000 and 8000 as actual values)
 
-please take note of the ngrok Enpoint URL that forwards to local port 6000 as it will be needed when setting the Voice API application, that URL looks like:
+please take note of the ngrok Enpoint URL that forwards to local port 6000 as it will be needed here for this Voice API application, that URL looks like:
 `xxxxxxxx.ngrok.xxx` (for ngrok), or `myserver.mycompany.com:32000`<br>
 (as **`PROCESSOR_SERVER`** in one of the next sections),<br>
 no `port` is necessary with ngrok as public host name,<br>
