@@ -28,6 +28,7 @@ You may also have your Vonage [Video API WebRTC Clients](https://tokbox.com/deve
 First set up the Connector server (aka middleware server) from one of the following repositories</br>
 https://github.com/nexmo-se/dg-oai-11l-connector,</br>
 https://github.com/nexmo-se/elevenlabs-agent-ws-connector,</br>
+https://github.com/nexmo-se/deepgram-connector,</br>
 https://github.com/nexmo-se/openai-realtime-connector,</br>
 https://github.com/nexmo-se/websocket-server-variant-3.</br>
 
