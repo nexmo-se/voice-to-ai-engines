@@ -39,8 +39,6 @@ Soon, the standalone Connector application for Deepgram Voice Agent will be crea
 
 Default local (not public!) of that Connector server `port` is: 6000.
 
-If you plan to test using `Local deployment` with ngrok (Internet tunneling service) for both the sample middleware server application and this sample Voice API application, you may set up [multiple ngrok tunnels](https://ngrok.com/docs/agent/config/#tunnel-configurations).
-
 If you plan to test using a `Local deployment` , you may use ngrok (an Internet tunneling service) for both this Voice API application and the Connector application with [multiple ngrok endpoints](https://ngrok.com/docs/agent/config/v3/#multiple-endpoints).
 
 For the next steps, you will need:
