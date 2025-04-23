@@ -34,6 +34,7 @@ https://github.com/nexmo-se/websocket-server-variant-3.</br>
 
 _Note:
 The current repository https://github.com/nexmo-se/vonage-deepgram-voice-agent combines both the sample Voice API application and the Connector application in one server program.<br>
+As of now, you may just use only the Connector part of it with your existing Voice API application to connect to Deepgram Voice Agent.<br>
 Soon, the standalone Connector application for Deepgram Voice Agent will be created like the other Connector repositories listed above._
 
 Default local (not public!) of that Connector server `port` is: 6000.
