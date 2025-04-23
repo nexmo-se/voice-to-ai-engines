@@ -39,12 +39,26 @@ Soon, the standalone Connector application for Deepgram Voice Agent will be crea
 
 Default local (not public!) of that Connector server `port` is: 6000.
 
-If you plan to test using a `Local deployment` , you may use ngrok (an Internet tunneling service) for both this Voice API application and the Connector application with [multiple ngrok endpoints](https://ngrok.com/docs/agent/config/v3/#multiple-endpoints).
+If you plan to test using a `Local deployment` , you may use ngrok (an Internet tunneling service) for both<br>
+this Voice API application<br>
+and the Connector application<br>
+with [multiple ngrok endpoints](https://ngrok.com/docs/agent/config/v3/#multiple-endpoints).
 
-For the next steps, you will need:
-- That Connector server public hostname and if necessary public port,</br>
-e.g. `xxxxxxxx.ngrok.xxx`, `myserver.mycompany.com:32000`  (as **`PROCESSOR_SERVER`**),</br>
-no `port` is necessary with ngrok as public hostname.</br>
+To do that, [install ngrok](https://ngrok.com/downloads).<br>
+Log in or sign up with [ngrok](https://ngrok.com/),<br>
+from the ngrok web UI menu, follow the **Setup and Installation** guide.
+
+Set up two domains,<br>
+one to forward to the local port 6000 (as the Connector application will be listening on port 6000),<br>
+the other one to the local port 8000 for this Voice API application.
+
+Start ngrok to start both tunnels that forward to local ports 6000 and 8000,<br>
+please take note of the ngrok Enpoint URL that forwards to local port 6000 as it will be needed when setting the Voice API application, that URL looks like:
+`xxxxxxxx.ngrok.xxx` (for ngrok),<br>
+`myserver.mycompany.com:32000`<br>
+(as **`PROCESSOR_SERVER`** in one of the next sections),<br>
+no `port` is necessary with ngrok as public host name,<br>
+that host name to specify must not have leading protocol text such as `https://`, `wss://`, nor trailing `/`.
 
 ### Set up your Vonage Voice API application credentials and phone number
 
@@ -72,7 +86,7 @@ For the next steps, you will need:</br>
 - Your `application ID` (as **`APP_ID`**),</br>
 - The **`phone number linked`** to your application (as **`SERVICE_PHONE_NUMBER`**), your phone will **call that number**,</br>
 
-### Local setup
+### Local deployment
 
 Copy or rename .env-example to .env<br>
 Update parameters in .env file<br>
