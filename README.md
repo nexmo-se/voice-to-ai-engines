@@ -117,7 +117,7 @@ To manually trigger an outbound PSTN call to a number, open a web browser, enter
 
 _https://\<server-address\>/call?number=\<number\>_<br>
 
-the \<number\> must be in E.164 format without leading '+' sign, or '-', '.' characters
+the \<number\> must be in E.164 format without leading '+' sign, nor space, '-', '.' characters
 
 for example, it looks like
 
