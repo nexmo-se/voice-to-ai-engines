@@ -92,7 +92,7 @@ For the next steps, you will need:</br>
 
 Copy or rename .env-example to .env<br>
 Update parameters in .env file<br>
-Have Node.js installed on your system, this application has been tested with Node.js version 18.19<br>
+Have Node.js installed on your system, this application has been tested with Node.js version 22.16<br>
 
 Install node modules with the command:<br>
  ```bash
@@ -109,27 +109,23 @@ Default local (not public!) of this application server `port` is: 8000.
 
 #### Inbound calling
 
-Call the **`phone number linked`** to your application to get connected to the Conversational AI Agent.
+Call the **`phone number linked`** to your application to get connected to the AI engine(s).
 
 #### Outbound calling
 
 To manually trigger an outbound PSTN call to a number, open a web browser, enter the address:<br>
 
-_https://\<server-address\>/call?callee=\<number\>_<br>
+_https://\<server-address\>/call?number=\<number\>_<br>
 
 the \<number\> must be in E.164 format without leading '+' sign, or '-', '.' characters
 
 for example, it looks like
 
-https://xxxx.ngrok.app/call?callee=12995551212
+https://xxxx.ngrok.xxx/call?number=12995551212
 
-Upon answering the call, the callee will get connected to the Conversational AI Agent.
+Upon answering the call, the callee will get connected to the AI engine(s).
 
-Of course, you may programmatically initiate outbound calls by using the API call listed in the corresponding webhook section of the program _voice-to-ai-engines.js_ (i.e. `/call`).
-
-### Cloud deployment
-
-Instructions on how to deploy both this Voice API application as well as the peer Connector application to [Vonage Cloud Runtime](https://developer.vonage.com/en/vonage-cloud-runtime/getting-started/technical-details) serverless infrastructure will be posted here soon.
+Of course, you may programmatically initiate outbound calls by using the API call listed in the corresponding webhook section of the program _voice-to-ai-engines.js_ (i.e. `/call` route).
 
 ## Additional resources
 

@@ -24,7 +24,9 @@ app.use(function (req, res, next) {
 //-------
 
 const servicePhoneNumber = process.env.SERVICE_PHONE_NUMBER;
-console.log("Service phone number:", servicePhoneNumber);
+console.log('------------------------------------------------------------');
+console.log("You may call in to the phone number:", servicePhoneNumber);
+console.log('------------------------------------------------------------');
 
 //--- Vonage API ---
 
@@ -75,12 +77,12 @@ if (process.env.RECORD_CALLS == 'true') {
 const maxCallDuration = process.env.MAX_CALL_DURATION; // in seconds
 
 console.log('------------------------------------------------------------');
-console.log('To manually trigger an outbound PSTN call to "callee" number');
+console.log('To manually trigger an outbound PSTN call to a phone number,');
 console.log('in a web browser, enter the address:');
-console.log('https://<server-address>/call?callee=<number>');
+console.log('https://<this-application-server-address>/call?number=<number>');
 console.log("<number> must in E.164 format without '+' sign, or '-', '.' characters");
 console.log('for example');
-console.log('https://xxxx.ngrok.app/call?callee=12995551212');
+console.log('https://xxxx.ngrok.xxx/call?number=12995551212');
 console.log('------------------------------------------------------------');
 
 
@@ -133,7 +135,7 @@ app.get('/answer', async(req, res) => {
   const nccoResponse = [
     {                     //-- this talk action section is optional
       "action": "talk",   
-      "text": "Connecting your call, please wait.",
+      "text": "Connecting your call. You may now speak.",
       "language": "en-US",
       "style": 11
     },
@@ -314,7 +316,7 @@ app.get('/answer_2', async(req, res) => {
   const nccoResponse = [
     {
       "action": "talk",
-      "text": "Hello. This is a call from your preferred voice agent, please wait.",
+      "text": "Hello. This is a call from your preferred provider. You may now speak.",
       "language": "en-US",
       "style": 11
     },
@@ -461,6 +463,6 @@ app.get('/_/health', async(req, res) => {
 
 const port = process.env.VCR_PORT || process.env.PORT || 8000;
 
-app.listen(port, () => console.log(`Voice API application listening on port ${port}!`));
+app.listen(port, () => console.log(`\nVoice API application listening on port ${port}`));
 
 //------------
