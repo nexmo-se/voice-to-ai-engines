@@ -32,10 +32,12 @@ console.log('------------------------------------------------------------');
 
 const { Auth } = require('@vonage/auth');
 
+const appId = process.env.APP_ID;
+
 const credentials = new Auth({
   apiKey: process.env.API_KEY,
   apiSecret: process.env.API_SECRET,
-  applicationId: process.env.APP_ID,
+  applicationId: appId,
   privateKey: './.private.key'    // private key file name with a leading dot 
 });
 
@@ -54,16 +56,15 @@ const vonage = new Vonage(credentials, options);
 const fs = require('fs');
 const request = require('request');
 
-const appId = process.env.APP_ID; // used by tokenGenerate
 const privateKey = fs.readFileSync('./.private.key'); // used by tokenGenerate
 const { tokenGenerate } = require('@vonage/jwt');
 
-const vonageNr = new Vonage(credentials, {} );  
+const vonageNr = new Vonage(credentials, {} );
 
 const region = process.env.API_REGION.substring(4, 6);
 // console.log("region:", region);
 const apiBaseUrl = "https://api-" + region +".vonage.com";
-// console.log("apiBaseUrl:", apiBaseUrl);
+console.log("apiBaseUrl:", apiBaseUrl);
 
 //-------------------
 
@@ -75,6 +76,7 @@ const processorServer = process.env.PROCESSOR_SERVER;
 let recordCalls = false;
 if (process.env.RECORD_CALLS == 'true') {
   recordCalls = true
+  console.log(">>> Call recordings enabled")
 }
 
 //---- Custom settings ---
@@ -258,7 +260,13 @@ app.get('/call', async(req, res) => {
        type: 'phone',
        number: servicePhoneNumber
       },
-      limit: maxCallDuration, // limit outbound call duration for demos purposes
+      advanced_machine_detection: {
+        "behavior": "continue",
+        "mode": "default",  // use this value for the latest AMD implementation
+        "beep_timeout": 45
+      },
+      ringing_timer: 25,
+      limit: 50, //  in seconds, limit outbound call duration for demos purposes
       answer_url: ['https://' + hostName + '/answer_2'],
       answer_method: 'GET',
       event_url: ['https://' + hostName + '/event_2'],
@@ -276,7 +284,7 @@ app.get('/call', async(req, res) => {
 app.get('/answer_2', async(req, res) => {
 
   const  hostName = req.hostname;
-  const uuid = req.query.uuid;   
+  const uuid = req.query.uuid;
 
   // WebSocket connection URI
   // Custom data: participant identified as 'user1' in this example, could be 'agent', 'customer', 'patient', 'doctor', '6tf623f9ffk4dcj91' ...
@@ -315,7 +323,7 @@ app.post('/event_2', async(req, res) => {
 
   //--
 
-    if (req.body.status == 'ringing' && recordCalls) {  
+  if (req.body.status == 'ringing' && recordCalls) {  
 
     const accessToken = tokenGenerate(appId, privateKey, {});
 
