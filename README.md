@@ -50,16 +50,16 @@ from the ngrok web UI menu, follow the **Setup and Installation** guide.
 
 Set up two tunnels,<br>
 one to forward to the local port 6000 (as the Connector application will be listening on port 6000),<br>
-the other one to the local port 8000 for this Voice API application,
-see this [sample yaml configuration file](https://ngrok.com/docs/agent/config/v2/#define-two-tunnels-named-httpbin-and-demo), but it needs port 6000 and 8000 as actual values,
-depending if you have a paid ngrok account or not, you may or may not be able to set a (static) domain name.
+the other one to the local port 8000 for this Voice API application,<br>
+see this [sample yaml configuration file](https://ngrok.com/docs/agent/config/v2/#define-two-tunnels-named-httpbin-and-demo), but it needs port 6000 and 8000 as actual values,<br>
+depending if you have a paid ngrok account or not, you may or may not be able to set (static) domain names.
 
 Start ngrok to start both tunnels that forward to local ports 6000 and 8000, e.g.<br>
 `ngrok start httpbin demo`
 
-please take note of the ngrok Enpoint URL that forwards to local port 6000 as it will be needed here for this Voice API application, that URL looks like:
-`xxxxxxxx.ngrok.xxx` (for ngrok), or `myserver.mycompany.com:32000` (public host name and port of your Connector application server)<br>
-(as **`PROCESSOR_SERVER`** in one of the next sections),<br>
+please take note of the ngrok Enpoint URL that forwards to local port 6000 as it will be needed here for this Voice API application environment variable as **`PROCESSOR_SERVER`** in one of the next sections, that URL looks like:<br>
+`xxxxxxxx.ngrok.xxx` (for ngrok),<br>
+or `myserver.mycompany.com:32000` (public host name and port of your Connector application server)<br>
 no `port` is necessary with ngrok as public host name,<br>
 that host name to specify must not have leading protocol text such as `https://`, `wss://`, nor trailing `/`.
 
