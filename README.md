@@ -42,28 +42,30 @@ Default local (not public!) of any one of the Connector servers `port` is: 6000.
 If you plan to test using a `Local deployment`, you may use ngrok (an Internet tunneling service) for both<br>
 this Voice API application<br>
 and the Connector application<br>
-with [multiple ngrok endpoints](https://ngrok.com/docs/agent/config/v2/#tunnel-configurations).
+with [multiple ngrok tunnels](https://ngrok.com/docs/agent/config/v2/#tunnel-configurations).
 
 To do that, [install ngrok](https://ngrok.com/downloads).<br>
 Log in or sign up with [ngrok](https://ngrok.com/),<br>
 from the ngrok web UI menu, follow the **Setup and Installation** guide.
 
-Set up two domains,<br>
+Set up two tunnels,<br>
 one to forward to the local port 6000 (as the Connector application will be listening on port 6000),<br>
-the other one to the local port 8000 for this Voice API application.
+the other one to the local port 8000 for this Voice API application,
+see this [sample yaml configuration file](https://ngrok.com/docs/agent/config/v2/#define-two-tunnels-named-httpbin-and-demo), but it needs port 6000 and 8000 as actual values,
+depending if you have a paid ngrok account or not, you may or may not be able to set a (static) domain name.
 
 Start ngrok to start both tunnels that forward to local ports 6000 and 8000, e.g.<br>
-`ngrok start httpbin demo` (per this [sample yaml configuration file](https://ngrok.com/docs/agent/config/v2/#define-two-tunnels-named-httpbin-and-demo), but needs port 6000 and 8000 as actual values)
+`ngrok start httpbin demo`
 
 please take note of the ngrok Enpoint URL that forwards to local port 6000 as it will be needed here for this Voice API application, that URL looks like:
-`xxxxxxxx.ngrok.xxx` (for ngrok), or `myserver.mycompany.com:32000`<br>
+`xxxxxxxx.ngrok.xxx` (for ngrok), or `myserver.mycompany.com:32000` (public host name and port of your Connector application server)<br>
 (as **`PROCESSOR_SERVER`** in one of the next sections),<br>
 no `port` is necessary with ngrok as public host name,<br>
 that host name to specify must not have leading protocol text such as `https://`, `wss://`, nor trailing `/`.
 
 ### Set up your Vonage Voice API application credentials and phone number
 
-[Log in to your](https://dashboard.nexmo.com/sign-in) or [sign up for a](https://dashboard.nexmo.com/sign-up) Vonage APIs account.
+[Log in to your](https://dashboard.nexmo.com/sign-in) or [sign up for a](https://ui.idp.vonage.com/ui/auth/registration) Vonage APIs account.
 
 Go to [Your applications](https://dashboard.nexmo.com/applications), access an existing application or [+ Create a new application](https://dashboard.nexmo.com/applications/new).
 
