@@ -71,15 +71,22 @@ Go to [Your applications](https://dashboard.nexmo.com/applications), access an e
 
 Under Capabilities section (click on [Edit] if you do not see this section):
 
-Enable Voice
-- Under Answer URL, leave HTTP GET, and enter https://\<host\>:\<port\>/answer (replace \<host\> and \<port\> with the public host name and if necessary public port of the server where this sample application is running)</br>
-- Under Event URL, **select** HTTP POST, and enter https://\<host\>:\<port\>/event (replace \<host\> and \<port\> with the public host name and if necessary public port of the server where this sample application is running)</br>
+**Enable** Voice
+- Under Answer URL, leave HTTP GET, and enter</br>
+https://\<host\>:\<port\>/answer</br>
+(replace \<host\> and \<port\> with the public host name and if necessary public port of the server where this sample application is running)</br>
+- Under Event URL, **select** HTTP POST, and enter</br>
+https://\<host\>:\<port\>/event</br>
+(replace \<host\> and \<port\> with the public host name and if necessary public port of the server where this sample application is running)</br>
 Note: If you are using ngrok for this sample application, the answer URL and event URL look like:</br>
-https://yyyyyyyy.ngrok.io/answer</br>
-https://yyyyyyyy.ngrok.io/event</br> 	
+https://yyyyyyyy.ngrok.xxx/answer</br>
+https://yyyyyyyy.ngrok.xxx/event</br> 	
 - Click on [Generate public and private key] if you did not yet create or want new ones, save the private key file in this application folder as .private.key (leading dot in the file name).</br>
-**IMPORTANT**: Do not forget to click on [Save changes] at the bottom of the screen if you have created a new key set.</br>
-- Link a phone number to this application if none has been linked to the application.
+- Click on [Generate new application] if you've just created the application.</br></br>
+
+**IMPORTANT**: If you already had an existing application and just created a new key set, do not forget to click on [Save changes] at the bottom of the screen.</br></br>
+
+- Link a phone number to this application if none has been linked to the application.</br>
 
 Please take note of your **application ID** and the **linked phone number** (as they are needed in the very next section).
 
