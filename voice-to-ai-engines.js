@@ -52,7 +52,8 @@ const vonage = new Vonage(credentials, options);
 //-- For call leg recording --
 
 const fs = require('fs');
-const request = require('request');
+// const request = require('request');
+const axios = require('axios');
 
 const appId = process.env.APP_ID; // used by tokenGenerate
 const privateKey = fs.readFileSync('./.private.key'); // used by tokenGenerate
@@ -104,14 +105,11 @@ app.get('/answer', async(req, res) => {
     //-- RTC webhooks need to be enabled for this application in the dashboard --
     //-- start "leg" recording --
     const accessToken = tokenGenerate(appId, privateKey, {});
-
-    // request.post(apiRegion + '/v1/legs/' + uuid + '/recording', {
-    request.post(apiBaseUrl + '/v1/legs/' + uuid + '/recording', {
-        headers: {
-            'Authorization': 'Bearer ' + accessToken,
-            "content-type": "application/json",
-        },
-        body: {
+  
+    try { 
+      // const response = await axios.post(apiRegion + '/v1/legs/' + uuid + '/recording',
+      const response = await axios.post(apiBaseUrl + '/v1/legs/' + uuid + '/recording',
+        {
           "split": true,
           "streamed": true,
           // "beep": true,
@@ -123,15 +121,18 @@ app.get('/answer', async(req, res) => {
           //   "sentiment_analysis": true
           // }
         },
-        json: true,
-      }, function (error, response, body) {
-        if (error) {
-          console.log('Error start recording on leg:', uuid, error.body);
+        {
+          headers: {
+            "Authorization": 'Bearer ' + accessToken,
+            "Content-Type": 'application/json'
+          }
         }
-        else {
-          console.log('Start recording on leg:', uuid, response.body);
-        }
-    });
+      );
+      console.log('\n>>> Start recording on leg:', uuid);
+    } catch (error) {
+      console.log('\n>>> Error start recording on leg:', uuid, error);
+    }
+
   } 
 
   //--
@@ -193,9 +194,9 @@ app.post('/event', async(req, res) => {
       event_method: 'POST'
       })
       .then(res => {
-        console.log(">>> WebSocket create status:", res);
+        console.log("\n>>> WebSocket create status:", res);
       })
-      .catch(err => console.error(">>> WebSocket create error:", err))  
+      .catch(err => console.error("\n>>> WebSocket create error:", err))  
 
   };
 
@@ -319,27 +320,28 @@ app.post('/event_2', async(req, res) => {
 
     const accessToken = tokenGenerate(appId, privateKey, {});
 
-    request.post(apiBaseUrl + '/v1/legs/' + req.body.uuid + '/recording', {
-        headers: {
-            'Authorization': 'Bearer ' + accessToken,
-            "content-type": "application/json",
-        },
-        body: {
+    try { 
+      // const response = await axios.post(apiRegion + '/v1/legs/' + uuid + '/recording',
+      const response = await axios.post(apiBaseUrl + '/v1/legs/' + uuid + '/recording',
+        {
           "split": true,
           "streamed": true,
           "public": true,
           "validity_time": 30,
           "format": "mp3"
         },
-        json: true,
-      }, function (error, response, body) {
-        if (error) {
-          console.log('error start recording:', error.body);
+        {
+          headers: {
+            "Authorization": 'Bearer ' + accessToken,
+            "Content-Type": 'application/json'
+          }
         }
-        else {
-          console.log('start recording response:', response.body);
-        }
-    });
+      );
+      console.log('\n>>> Start recording on leg:', uuid);
+    } catch (error) {
+      console.log('\n>>> Error start recording on leg:', uuid, error);
+    }
+
   }
 
   //--
@@ -369,9 +371,9 @@ app.post('/event_2', async(req, res) => {
       event_method: 'POST'
       })
       .then(res => {
-        console.log(">>> WebSocket create status:", res);
+        console.log("\n>>> WebSocket create status:", res);
       })
-      .catch(err => console.error(">>> WebSocket create error:", err))   
+      .catch(err => console.error("\n>>> WebSocket create error:", err))   
 
   };
 
