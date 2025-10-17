@@ -26,6 +26,8 @@ You may instead have your Vonage [Video API WebRTC Clients](https://developer.vo
 
 First set up the Connector server (aka middleware server) from one of the following repositories</br>
 
+Deepgram Voice Agent</br>
+ https://github.com/nexmo-se/vonage-deepgram-voice-agent,</br></br>
 Deepgram ASR - OpenAI LLM - ElevenLabs TTS</br>
 https://github.com/nexmo-se/dg-oai-11l-connector,</br></br>
 ElevenLabs Agent</br>
