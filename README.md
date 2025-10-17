@@ -25,10 +25,18 @@ You may instead have your Vonage [Video API WebRTC Clients](https://developer.vo
 ### Set up the sample Connector server - Host server public hostname and port
 
 First set up the Connector server (aka middleware server) from one of the following repositories</br>
-https://github.com/nexmo-se/dg-oai-11l-connector,</br>
-https://github.com/nexmo-se/elevenlabs-agent-ws-connector,</br>
-https://github.com/nexmo-se/deepgram-connector,</br>
-https://github.com/nexmo-se/openai-realtime-connector,</br>
+
+Deepgram ASR - OpenAI LLM - ElevenLabs TTS</br>
+https://github.com/nexmo-se/dg-oai-11l-connector,</br></br>
+ElevenLabs Agent</br>
+https://github.com/nexmo-se/elevenlabs-agent-ws-connector,</br></br>
+Deepgram ASR</br>
+https://github.com/nexmo-se/deepgram-connector,</br></br>
+OpenAI STS Realtime API,</br>
+https://github.com/nexmo-se/openai-realtime-connector,</br></br>
+HumeAI STS EVI + Immersitech Noise Cancellation / Voice Isolation,</br>
+https://github.com/nexmo-se/humeai-connector,</br></br>
+
 https://github.com/nexmo-se/websocket-server-variant-3.</br>
 
 _Note:
