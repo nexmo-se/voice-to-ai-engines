@@ -48,6 +48,7 @@ const credentials = new Auth({
 const { Vonage } = require('@vonage/server-sdk');
 
 // const vonage = new Vonage(credentials, options);
+
 const vonage = new Vonage(credentials);
 
 //-- For call leg recording --
@@ -80,12 +81,13 @@ if (process.env.RECORD_CALLS == 'true') {
 
 //---- Custom settings ---
 const maxCallDuration = process.env.MAX_CALL_DURATION; // in seconds
+const liveAgentPhoneNumber = process.env.LIVE_AGENT_PHONE_NUMBER; // E.164 format without leading '+' sign
 
 console.log('------------------------------------------------------------');
 console.log('To manually trigger an outbound PSTN call to a phone number,');
 console.log('in a web browser, enter the address:');
 console.log('https://<this-application-server-address>/call?number=<number>');
-console.log("<number> must in E.164 format without '+' sign, or '-', '.' characters");
+console.log("callee <number> must be in E.164 format without '+' sign, or '-', '.' characters");
 console.log('for example');
 console.log('https://xxxx.ngrok.xxx/call?number=12995551212');
 console.log('------------------------------------------------------------');
@@ -206,17 +208,41 @@ app.post('/event', async(req, res) => {
 
 app.get('/ws_answer_1', async(req, res) => {
 
-  const uuid = req.query.original_uuid;
+  const originalUuid = req.query.original_uuid;
+  const hostName = req.hostname;
 
   const nccoResponse = [
     {
       "action": "conversation",
-      "name": "conf_" + uuid,
+      "name": "conf_" + originalUuid,
       "startOnEnter": true
     }
   ];
 
   res.status(200).json(nccoResponse);
+
+  //-- Below, simulate call transfer to a live agent after 15 sec,
+  //-- this is just for call flow and API requests demo.
+  //-- Normally, there is no code to transfer call here, as a
+  //-- transfer to live agent is initiated by user's interaction
+  //-- with a Voice AI and other business logic of your actual use case.
+
+  setTimeout ( async() => {
+
+    await axios.post('https://' + hostName + '/trftoliveagentpstn',
+      {
+        "originalUuid": originalUuid,
+        "websocketUuid": req.query.uuid,
+        "agentPhoneNumber": liveAgentPhoneNumber
+      },
+      {
+        headers: {
+          "Content-Type": 'application/json'
+        }
+      }
+    );
+
+  }, 15000);
 
  });
 
@@ -383,21 +409,46 @@ app.post('/event_2', async(req, res) => {
 
 app.get('/ws_answer_2', async(req, res) => {
 
-  const uuid = req.query.original_uuid;
+  const originalUuid = req.query.original_uuid;
+  const hostName = req.hostname;
 
   const nccoResponse = [
     {
       "action": "conversation",
-      "name": "conf_" + uuid,
+      "name": "conf_" + originalUuid,
       "startOnEnter": true
     }
   ];
 
   res.status(200).json(nccoResponse);
 
+  //-- Below, simulate call transfer to a live agent after 15 sec,
+  //-- this is just for call flow and API requests demo.
+  //-- Normally, there is no code to transfer call here, as a
+  //-- transfer to live agent is initiated by user's interaction
+  //-- with a Voice AI and other business logic of your actual use case.
+
+  setTimeout ( async() => {
+
+    await axios.post('https://' + hostName + '/trftoliveagentpstn',
+      {
+        "originalUuid": originalUuid,
+        "websocketUuid": req.query.uuid,
+        "agentPhoneNumber": liveAgentPhoneNumber
+      },
+      {
+        headers: {
+          "Content-Type": 'application/json'
+        }
+      }
+    );
+
+  }, 15000);
+
+
  });
 
-//------------
+//-------------
 
 app.post('/ws_event_2', async(req, res) => {
 
@@ -406,6 +457,77 @@ app.post('/ws_event_2', async(req, res) => {
 });
 
 //------------
+
+app.post('/trftoliveagentpstn', async(req, res) => {
+
+  res.status(200).send('Ok');
+
+  //--
+
+  const originalUuid = req.body.originalUuid;
+  const hostName = req.hostname;
+
+  //-- Terminate WebSocket to Voice AI (if you do not use AI Assisting live agent) --
+
+  vonage.voice.hangupCall(req.body.websocketUuid)
+    .then(res => console.log(">>> Terminated WebSocket leg", uuid))
+    .catch(err => null) // WebSocket leg has already terminated
+
+  //-- Outgoing PSTN call --
+
+  vonage.voice.createOutboundCall({ // Initiate call to live agent
+    to: [{
+      type: 'phone',
+      number: req.body.agentPhoneNumber
+    }],
+    from: {
+     type: 'phone',
+     number: servicePhoneNumber
+    },
+    answer_url: ['https://' + hostName + '/answer_liveagent?original_uuid=' + originalUuid],
+    answer_method: 'GET',
+    event_url: ['https://' + hostName + '/event_liveagent?original_uuid=' + originalUuid],
+    event_method: 'POST'
+    })
+    .then(res => console.log(">>> Outgoing PSTN call to live agent status:", res))
+    .catch(err => console.error(">>> Outgoing PSTN call to live agent error:", err))
+
+  //-- Play ring back tone (as "Music on Hold") to waiting remote party --
+    vonage.voice.streamAudio(originalUuid, 'http://client-sdk-cdn-files.s3.us-east-2.amazonaws.com/us.mp3', 0, -0.6)
+
+});
+
+//------------
+
+app.get('/answer_liveagent', async(req, res) => {
+
+  const originalUuid = req.query.original_uuid;
+
+  const nccoResponse = [
+    {
+      "action": "conversation",
+      "name": "conf_" + originalUuid,
+      "startOnEnter": true,
+      "endOnExit": true
+    }
+  ];
+
+  res.status(200).json(nccoResponse);
+
+  //-- Stop ring back tone (as MoH) to waiting remote party --
+  vonage.voice.stopStreamAudio(originalUuid);
+
+});  
+
+//--------------  
+
+app.post('/event_liveagent', async(req, res) => {
+
+  res.status(200).send('Ok');
+
+});
+
+//--------------  
 
 app.post('/results', async(req, res) => {
 
