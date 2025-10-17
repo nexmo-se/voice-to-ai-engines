@@ -39,7 +39,7 @@ https://github.com/nexmo-se/openai-realtime-connector,</br></br>
 HumeAI STS EVI + Immersitech Noise Cancellation / Voice Isolation,</br>
 https://github.com/nexmo-se/humeai-connector,</br></br>
 
-https://github.com/nexmo-se/websocket-server-variant-3.</br>
+https://github.com/nexmo-se/websocket-server-variant-3.</br> 
 
 _Note:
 The current repository https://github.com/nexmo-se/vonage-deepgram-voice-agent combines both the sample Voice API application and the Connector application in one server program.<br>
