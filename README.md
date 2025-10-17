@@ -36,7 +36,7 @@ Deepgram ASR</br>
 https://github.com/nexmo-se/deepgram-connector,</br></br>
 OpenAI STS Realtime API</br>
 https://github.com/nexmo-se/openai-realtime-connector,</br></br>
-HumeAI STS EVI + Immersitech Noise Cancellation / Voice Isolation</br>
+Hume STS EVI + Immersitech Noise Cancellation / Voice Isolation</br>
 https://github.com/nexmo-se/humeai-connector,</br></br>
 
 https://github.com/nexmo-se/websocket-server-variant-3.</br> 
