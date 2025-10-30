@@ -154,7 +154,10 @@ https://xxxx.ngrok.xxx/call?number=12995551212
 
 Upon answering the call, the callee will get connected to the AI engine(s).
 
-Of course, you may programmatically initiate outbound calls by using the API call listed in the corresponding webhook section of the program _voice-to-ai-engines.js_ (i.e. `/call` route).
+Of course, you may programmatically initiate outbound calls by using the API call listed in the corresponding webhook section, i.e. `/call` route, of the program<br>
+_voice-to-ai-engines.js_<br>
+or<br>
+_voice-to-ai-engines-with-transfer-to-live-agent.js_.
 
 ## Additional resources
 
