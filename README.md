@@ -92,9 +92,13 @@ Note: If you are using ngrok for this sample application, the answer URL and eve
 https://yyyyyyyy.ngrok.xxx/answer</br>
 https://yyyyyyyy.ngrok.xxx/event</br> 	
 - Click on [Generate public and private key] if you did not yet create or want new ones, save the private key file in this application folder as .private.key (leading dot in the file name).</br>
+
+- Make sure a value is selected in the dropdown under **Region**
+_Note: There is no need to set a region in the application code itself_
+
 - Click on [Generate new application] if you've just created the application.</br></br>
 
-**IMPORTANT**: If you already had an existing application and just created a new key set, do not forget to click on [Save changes] at the bottom of the screen.</br></br>
+**IMPORTANT**: If you already have an existing application and just changed some parameter values including created a new public and private key set, do not forget to click on [Save changes] at the bottom of the screen.</br></br>
 
 - Link a phone number to this application if none has been linked to the application.</br>
 
@@ -117,11 +121,18 @@ Install node modules with the command:<br>
 npm install
 ```
 
-Launch the application:<br>
+Launch the server application with either of the following commands:<br>
 ```bash
 node voice-to-ai-engines
 ```
-Default local (not public!) of this application server `port` is: 8000.
+or
+```bash
+node voice-to-ai-engines-with-transfer-to-live-agent
+```
+
+The second server application initiates a call transfer to a live person (after 15 seconds in this sample code). 
+
+Default local (not public!) `port` of either server application is: 8000.
 
 ### How to make PSTN calls
 

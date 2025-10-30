@@ -21,14 +21,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-//-------
-
-const servicePhoneNumber = process.env.SERVICE_PHONE_NUMBER;
-console.log('------------------------------------------------------------');
-console.log("You may call in to the phone number:", servicePhoneNumber);
-console.log('------------------------------------------------------------');
-
-//--- Vonage API ---
+//--- Vonage API - SDK instance ---
 
 const { Auth } = require('@vonage/auth');
 
@@ -39,18 +32,18 @@ const credentials = new Auth({
   privateKey: './.private.key'    // private key file name with a leading dot 
 });
 
-// const apiRegion = "https://" + process.env.API_REGION;
-
-// const options = {
-//   apiHost: apiRegion
-// };
-
 const { Vonage } = require('@vonage/server-sdk');
 
-// const vonage = new Vonage(credentials, options);
 const vonage = new Vonage(credentials);
 
-//-- For call leg recording --
+//-- Vonage API - A phone number associated to this application (see in dashboard) --
+
+const servicePhoneNumber = process.env.SERVICE_PHONE_NUMBER;
+console.log('------------------------------------------------------------');
+console.log("You may call in to the phone number:", servicePhoneNumber);
+console.log('------------------------------------------------------------');
+
+//-- Vonage API - For optional call leg recording --
 
 const fs = require('fs');
 const axios = require('axios');
@@ -59,27 +52,22 @@ const appId = process.env.APP_ID; // used by tokenGenerate
 const privateKey = fs.readFileSync('./.private.key'); // used by tokenGenerate
 const { tokenGenerate } = require('@vonage/jwt');
 
-const vonageNr = new Vonage(credentials, {} );  
-
-const region = process.env.API_REGION.substring(4, 6);
-// console.log("region:", region);
-const apiBaseUrl = "https://api-" + region +".vonage.com";
-// console.log("apiBaseUrl:", apiBaseUrl);
-
-//-------------------
-
-// Connector server (middleware)
-const processorServer = process.env.PROCESSOR_SERVER;
-
-//-------------------
+const apiBaseUrl = 'https://api.nexmo.com';
 
 let recordCalls = false;
 if (process.env.RECORD_CALLS == 'true') {
   recordCalls = true
 }
 
+//-------------------
+
+//---- Connector server (middleware) ----
+const processorServer = process.env.PROCESSOR_SERVER;
+
 //---- Custom settings ---
 const maxCallDuration = process.env.MAX_CALL_DURATION; // in seconds
+
+//-----------------------------------------------------------------------------------
 
 console.log('------------------------------------------------------------');
 console.log('To manually trigger an outbound PSTN call to a phone number,');
@@ -89,7 +77,6 @@ console.log("<number> must in E.164 format without '+' sign, or '-', '.' charact
 console.log('for example');
 console.log('https://xxxx.ngrok.xxx/call?number=12995551212');
 console.log('------------------------------------------------------------');
-
 
 //============= Processing inbound PSTN calls ===============
 
@@ -103,11 +90,11 @@ app.get('/answer', async(req, res) => {
 
   if (recordCalls) {
     //-- RTC webhooks need to be enabled for this application in the dashboard --
+    
     //-- start "leg" recording --
     const accessToken = tokenGenerate(appId, privateKey, {});
   
     try { 
-      // const response = await axios.post(apiRegion + '/v1/legs/' + uuid + '/recording',
       const response = await axios.post(apiBaseUrl + '/v1/legs/' + uuid + '/recording',
         {
           "split": true,
@@ -321,7 +308,6 @@ app.post('/event_2', async(req, res) => {
     const accessToken = tokenGenerate(appId, privateKey, {});
 
     try { 
-      // const response = await axios.post(apiRegion + '/v1/legs/' + uuid + '/recording',
       const response = await axios.post(apiBaseUrl + '/v1/legs/' + uuid + '/recording',
         {
           "split": true,
@@ -418,7 +404,7 @@ app.post('/results', async(req, res) => {
 //-------------
 
 //-- Retrieve call recordings --
-//-- RTC webhook URL set to 'https://<server>/rtc' for this application in the dashboard --
+//-- RTC webhook URL set to 'https://<this-server>/rtc' for this application in the dashboard --
 
 app.post('/rtc', async(req, res) => {
 
@@ -431,7 +417,7 @@ app.post('/rtc', async(req, res) => {
       console.log('req.body.body.destination_url', req.body.body.destination_url);
       console.log('req.body.body.recording_id', req.body.body.recording_id);
 
-      await vonageNr.voice.downloadRecording(req.body.body.destination_url, './post-call-data/' + req.body.body.recording_id + '_' + req.body.body.channel.id + '.mp3');
+      await vonage.voice.downloadRecording(req.body.body.destination_url, './post-call-data/' + req.body.body.recording_id + '_' + req.body.body.channel.id + '.mp3');
  
       break;
 
@@ -440,7 +426,7 @@ app.post('/rtc', async(req, res) => {
       console.log('req.body.body.transcription_url', req.body.body.transcription_url);
       console.log('req.body.body.recording_id', req.body.body.recording_id);
 
-      await vonageNr.voice.downloadTranscription(req.body.body.transcription_url, './post-call-data/' + req.body.body.recording_id + '.txt');  
+      await vonage.voice.downloadTranscription(req.body.body.transcription_url, './post-call-data/' + req.body.body.recording_id + '.txt');  
 
       break;      
     
